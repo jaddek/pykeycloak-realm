@@ -1,0 +1,110 @@
+#!/bin/sh
+
+###################
+# Message functions
+###################
+if [ -t 1 ]; then
+    RED='\033[0;31m'
+    YELLOW='\033[0;33m'
+    BLUE='\033[0;34m'
+    CYAN='\033[0;36m'
+    RESET='\033[0m'
+else
+    RED='' YELLOW='' BLUE='' CYAN='' RESET=''
+fi
+
+info() {
+    printf "${BLUE}[INFO]${RESET} %s\n" "$*"
+}
+
+debug() {
+    # Enable debugging with environment variable DEBUG=1
+    [ "$DEBUG" = "1" ] && printf "${CYAN}[DEBUG]${RESET} %s\n" "$*"
+}
+
+warn() {
+    printf "${YELLOW}[WARN]${RESET} %s\n" "$*" >&2
+}
+
+error() {
+    printf "${RED}[ERROR]${RESET} %s\n" "$*" >&2
+}
+
+##########################
+# Configurable parameters
+##########################
+REALM_FILE="${1:-$REALM_FILE}"
+REALM_NAME="${2:-$REALM_NAME}"
+
+MAX_RETRIES="${MAX_RETRIES:-5}"
+RETRY_DELAY="${RETRY_DELAY:-5}"
+
+########################
+# Check required values
+#########################
+if [ -z "$REALM_FILE" ] || [ -z "$REALM_NAME" ]; then
+    error "Realm file and realm name must be provided as arguments or environment variables."
+    info "Usage: $0 {realm-file.json} {realm-name}"
+    exit 1
+fi
+
+if [ -z "$KEYCLOAK_INSTANCE_URL" ] || [ -z "$KC_BOOTSTRAP_ADMIN_USERNAME" ] || [ -z "$KC_BOOTSTRAP_ADMIN_PASSWORD" ]; then
+    error "KEYCLOAK_INSTANCE_URL, KC_BOOTSTRAP_ADMIN_USERNAME, or KC_BOOTSTRAP_ADMIN_PASSWORD not set."
+    exit 1
+fi
+
+#############################
+# Authenticate with Keycloak
+#############################
+for i in $(seq 1 "$MAX_RETRIES"); do
+    debug "Authentication attempt $i"
+    if /opt/keycloak/bin/kcadm.sh config credentials \
+         --server "$KEYCLOAK_INSTANCE_URL" \
+         --realm master \
+         --user "$KC_BOOTSTRAP_ADMIN_USERNAME" \
+         --password "$KC_BOOTSTRAP_ADMIN_PASSWORD"; then
+        info "Authenticated with Keycloak successfully"
+        break
+    fi
+
+    if [ "$i" -lt "$MAX_RETRIES" ]; then
+        warn "Authentication failed. Retrying in $RETRY_DELAY seconds ($i/$MAX_RETRIES)..."
+        sleep "$RETRY_DELAY"
+    else
+        error "Authentication failed after $MAX_RETRIES attempts"
+        exit 1
+    fi
+done
+
+###################
+# Check realm file
+###################
+if [ ! -f "$REALM_FILE" ]; then
+    error "Realm file '$REALM_FILE' not found"
+    exit 1
+fi
+
+########################
+# Check if realm exists
+########################
+info "Checking if realm '$REALM_NAME' exists..."
+if /opt/keycloak/bin/kcadm.sh get realms/"$REALM_NAME" >/dev/null 2>&1; then
+    warn "Realm '$REALM_NAME' exists. Deleting..."
+    /opt/keycloak/bin/kcadm.sh delete realms/"$REALM_NAME" || {
+        error "Failed to delete realm '$REALM_NAME'"
+        exit 1
+    }
+else
+    info "Realm '$REALM_NAME' does not exist. Proceeding with export."
+fi
+
+###################
+# Import realm
+###################
+info "Export realm from $REALM_FILE..."
+/opt/keycloak/bin/kcadm.sh create realms -f "$REALM_FILE" || {
+    error "Failed to export realm from $REALM_FILE"
+    exit 1
+}
+
+info "Realm '$REALM_NAME' imported successfully"

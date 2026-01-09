@@ -1,0 +1,127 @@
+[project]
+name = "pykeycloak-realm"
+version = "0.1.0"
+description = ""
+readme = "README.md"
+requires-python = ">=3.12,<3.15"
+license = {text = "MIT"}
+authors = [
+    {name = "Tony Nazarov", email = "tonynazarov@gmail.com"},
+]
+maintainers = [
+    {name = "Tony Nazarov", email = "tonynazarov@gmail.com"},
+]
+classifiers = [
+]
+keywords = ["keycloak", "oauth", "openid", "authentication", "authorization", "async", "realm", "generator"]
+
+dependencies = [
+    "click>=8.3.1",
+    "poethepoet>=0.40.0",
+]
+
+[tool.black]
+line-length = 88
+target-version = ['py312', 'py313']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+    \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+)/
+'''
+
+[tool.ruff]
+target-version = "py314"
+line-length = 88
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "B",  # flake8-bugbear
+    "C4", # flake8-comprehensions
+    "UP", # pyupgrade
+    "ASYNC", # flake8-async
+    "S",  # flake8-bandit (security)
+]
+ignore = [
+    "E501",  # line too long, handled by black
+    "B008",  # do not perform function calls in argument defaults
+]
+extend-exclude = [
+    ".git",
+    "__pycache__",
+    ".pytest_cache",
+    "build",
+    "dist",
+    "*.egg-info",
+]
+
+[tool.ruff.per-file-ignores]
+"__init__.py" = ["F401"]  # unused imports in __init__ are okay
+"tests/**/*.py" = ["S101"]  # allow asserts in tests
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+
+[[tool.mypy.overrides]]
+module = [
+    "tests.*",
+    "test.*",
+    "*.tests",
+    "*.test",
+]
+disallow_untyped_defs = false
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+addopts = "-ra -q --strict-markers --strict-config"
+testpaths = [
+    "tests",
+    "tnkeycloak/tests",
+]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: integration tests",
+    "unit: unit tests",
+]
+asyncio_mode = "auto"
+filterwarnings = [
+    "error",
+    "ignore::DeprecationWarning",
+]
+
+fail_under = 80
+
+[build-system]
+requires = ["uv_build>=0.9.9,<0.10.0"]
+build-backend = "uv_build"
+
+
+[tool.poe.tasks]
+realm-build = "uv run python src/pykeycloak_realm/realm.py"
+rb          = "uv run python src/pykeycloak_realm/realm.py"

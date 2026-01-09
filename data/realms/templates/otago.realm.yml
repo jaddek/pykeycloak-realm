@@ -1,0 +1,879 @@
+envs:
+  rn: &env_realm_name "otago"
+  rdn: &env_realm_display_name "OTAGO"
+  rdnh: &env_realm_display_name_html "OTAGO"
+  rkv: &env_realm_keycloak_version "26.3.3"
+  clients:
+    - id: &env_otago__id "e9c0a406-e9c0-72b7-8924-aedcd8e306e0"
+      cid: &env_otago__client_id "otago_proxy_service_client"
+      cid_alias: "ot_cid"
+      cn: &env_otago__name "Otago proxy service client"
+      cs: &env_otago__secret "rJhU44w9JpYjV7C2bRllVLdXSHI27gW5"
+      dr: &env_otago__default_roles "default-roles-otago"
+      sa: &env_otago__service_account "service-account-otago_proxy_service_client"
+vars:
+  # decision strategy = ds
+  v_ds_p: &v_ds_positive "POSITIVE"
+
+  # permission resource = pr
+  v_pr: &v_perm_rsrc "resource"
+  # permission scope = pr
+  v_ps: &v_perm_scp  "scope"
+
+  # decision strategy affirmative = dsa
+  v_ds_a: &v_ds_affirmative "AFFIRMATIVE"
+
+  # resource urn = resu
+  v_resu_s: &v_res_urn_section "urn:section"
+  v_resu_u: &v_res_urn_user "urn:user"
+
+
+  client_roles: # v_clr = var client role; v_pl = var policy role
+    ###
+    - v_clr_id: &v_cv_admin_id "62f5a392-62f5-7a0d-8683-b84d1a77eec4"
+      v_clr_n: &v_cv_admin_name "system_role__otago_admin"
+      v_pl_n: &v_pv_superadmin_name "policy_role__otago_admin"
+
+    ###
+    - v_clr_id: &v_cv_regular_user_id "8025a392-8025-7fa8-9c99-bc7d11f778ad"
+      v_clr_n: &v_cv_regular_user_name "public_role__otago_regular_user"
+      v_pl_n: &v_pv_regular_user_name "policy_role__otago_regular_user"
+
+      ###
+      v_pl_da: &v_pv_deny_all "system_policy_time__deny_all"
+
+  scopes: # v_scp = var scopes
+    v_v: &v_scp_view "view"
+    v_u: &v_scp_update "update"
+
+  resources: # v_res = var resource
+    # Users
+    v_rus: &v_res_users_section "/otago/users"
+    v_ruo: &v_res_users_objects "/otago/users/{user_id}"
+
+    # Roles
+    v_rrs: &v_res_roles_section "/otago/roles"
+
+  ################################
+  # Default partial structs (dps)
+  ################################
+
+  auth:
+    ###
+    resources:
+      scopes:
+      ###
+      # _vu_ view (v); update (u);
+      ###
+
+      ###
+      v_ds_vu: &v_s_vu
+        scopes:
+          - *v_scp_view
+          - *v_scp_update
+
+      ###
+      v_ds_v: &v_s_v
+        scopes:
+          - *v_scp_view
+
+    ###
+    policies:
+      ###
+      # v_dps_p = var default partial struct: policies
+      ###
+
+      v_dps_p_roles: &v_dps_p_role
+        type: role
+        logic: *v_ds_positive
+
+      v_dps_p_scope_based_on_section_resource_permission: &v_dps_p_scope_based_on_section_resource_permission
+        type: *v_perm_scp
+        decisionStrategy: *v_ds_affirmative
+        logic: *v_ds_positive
+        policies:
+          - *v_pv_superadmin_name
+
+      v_dps_p_scope_based_on_objects_resource_permission: &v_dps_p_scope_based_on_objects_resource_permission
+        type: *v_perm_scp
+        decisionStrategy: *v_ds_affirmative
+        logic: *v_ds_positive
+        policies:
+          - *v_pv_superadmin_name
+
+  ###
+  # v_dps_r = var default partial struct: user
+  ###
+  users: &v_dps_user
+    enabled: true
+    emailVerified: true
+    lastName: Keycloak
+    credentials:
+      - type: password
+        value: password
+        temporary: false
+
+
+
+
+realm:
+  realm: *env_realm_name
+  displayName: *env_realm_display_name
+  displayNameHtml: *env_realm_display_name_html
+  keycloakVersion: *env_realm_keycloak_version
+  enabled: true
+
+  # Default значения создания realm
+  defaultSignatureAlgorithm: RS256
+  revokeRefreshToken: false
+  refreshTokenMaxReuse: 0
+  accessTokenLifespan: 604800
+  accessTokenLifespanForImplicitFlow: 604800
+  ssoSessionIdleTimeout: 2592000
+  ssoSessionMaxLifespan: 2592000
+  ssoSessionIdleTimeoutRememberMe: 0
+  ssoSessionMaxLifespanRememberMe: 0
+  offlineSessionIdleTimeout: 2592000
+  offlineSessionMaxLifespanEnabled: false
+  offlineSessionMaxLifespan: 5184000
+  clientSessionIdleTimeout: 0
+  clientSessionMaxLifespan: 0
+  clientOfflineSessionIdleTimeout: 0
+  clientOfflineSessionMaxLifespan: 0
+  accessCodeLifespan: 60
+  accessCodeLifespanUserAction: 300
+  accessCodeLifespanLogin: 1800
+  actionTokenGeneratedByAdminLifespan: 43200
+  actionTokenGeneratedByUserLifespan: 300
+  oauth2DeviceCodeLifespan: 600
+  oauth2DevicePollingInterval: 5
+  sslRequired: external
+  registrationAllowed: false
+  registrationEmailAsUsername: false
+  rememberMe: false
+  verifyEmail: false
+  loginWithEmailAllowed: true
+  duplicateEmailsAllowed: false
+  resetPasswordAllowed: false
+  editUsernameAllowed: false
+  bruteForceProtected: false
+  permanentLockout: false
+  maxTemporaryLockouts: 0
+  bruteForceStrategy: MULTIPLE
+  maxFailureWaitSeconds: 900
+  minimumQuickLoginWaitSeconds: 60
+  waitIncrementSeconds: 60
+  quickLoginCheckMilliSeconds: 1000
+  maxDeltaTimeSeconds: 43200
+  failureFactor: 30
+
+  requiredCredentials:
+    - password
+  otpPolicyType: totp
+  otpPolicyAlgorithm: HmacSHA1
+  otpPolicyInitialCounter: 0
+  otpPolicyDigits: 6
+  otpPolicyLookAheadWindow: 1
+  otpPolicyPeriod: 30
+  otpPolicyCodeReusable: false
+  otpSupportedApplications:
+    - totpAppFreeOTPName
+    - totpAppGoogleName
+    - totpAppMicrosoftAuthenticatorName
+  localizationTexts: { }
+  webAuthnPolicyRpEntityName: keycloak
+  webAuthnPolicySignatureAlgorithms:
+    - ES256
+    - RS256
+  webAuthnPolicyRpId: ''
+  webAuthnPolicyAttestationConveyancePreference: not specified
+  webAuthnPolicyAuthenticatorAttachment: not specified
+  webAuthnPolicyRequireResidentKey: not specified
+  webAuthnPolicyUserVerificationRequirement: not specified
+  webAuthnPolicyCreateTimeout: 0
+  webAuthnPolicyAvoidSameAuthenticatorRegister: false
+  webAuthnPolicyAcceptableAaguids: [ ]
+  webAuthnPolicyExtraOrigins: [ ]
+  webAuthnPolicyPasswordlessRpEntityName: keycloak
+  webAuthnPolicyPasswordlessSignatureAlgorithms:
+    - ES256
+    - RS256
+  webAuthnPolicyPasswordlessRpId: ''
+  webAuthnPolicyPasswordlessAttestationConveyancePreference: not specified
+  webAuthnPolicyPasswordlessAuthenticatorAttachment: not specified
+  webAuthnPolicyPasswordlessRequireResidentKey: not specified
+  webAuthnPolicyPasswordlessUserVerificationRequirement: not specified
+  webAuthnPolicyPasswordlessCreateTimeout: 0
+  webAuthnPolicyPasswordlessAvoidSameAuthenticatorRegister: false
+  webAuthnPolicyPasswordlessAcceptableAaguids: [ ]
+  webAuthnPolicyPasswordlessExtraOrigins: [ ]
+
+
+  browserSecurityHeaders:
+    contentSecurityPolicyReportOnly: ''
+    xContentTypeOptions: nosniff
+    referrerPolicy: no-referrer
+    xRobotsTag: none
+    xFrameOptions: SAMEORIGIN
+    contentSecurityPolicy: frame-src 'self'; frame-ancestors 'self'; object-src 'none';
+    strictTransportSecurity: max-age=31536000; includeSubDomains
+  smtpServer: { }
+
+  #############
+  # Events
+  #############
+
+  eventsEnabled: false
+  eventsExpiration: 259200
+  eventsListeners:
+    - jboss-logging
+  enabledEventTypes:
+    - VERIFY_PROFILE_ERROR
+    - REVOKE_GRANT
+    - LOGIN_ERROR
+    - CLIENT_LOGIN
+    - RESET_PASSWORD_ERROR
+    - UPDATE_CREDENTIAL
+    - IMPERSONATE_ERROR
+    - CODE_TO_TOKEN_ERROR
+    - CUSTOM_REQUIRED_ACTION
+    - OAUTH2_DEVICE_CODE_TO_TOKEN_ERROR
+    - RESTART_AUTHENTICATION
+    - IMPERSONATE
+    - UPDATE_PROFILE_ERROR
+    - LOGIN
+    - UPDATE_PASSWORD_ERROR
+    - REMOVE_CREDENTIAL_ERROR
+    - TOKEN_EXCHANGE
+    - AUTHREQID_TO_TOKEN
+    - LOGOUT
+    - REGISTER
+    - DELETE_ACCOUNT_ERROR
+    - CLIENT_REGISTER
+    - USER_DISABLED_BY_TEMPORARY_LOCKOUT
+    - DELETE_ACCOUNT
+    - UPDATE_PASSWORD
+    - CLIENT_DELETE
+    - IDENTITY_PROVIDER_FIRST_LOGIN
+    - CLIENT_DELETE_ERROR
+    - CLIENT_LOGIN_ERROR
+    - RESTART_AUTHENTICATION_ERROR
+    - EXECUTE_ACTIONS
+    - TOKEN_EXCHANGE_ERROR
+    - PERMISSION_TOKEN
+    - UPDATE_CREDENTIAL_ERROR
+    - EXECUTE_ACTION_TOKEN_ERROR
+    - OAUTH2_EXTENSION_GRANT_ERROR
+    - OAUTH2_DEVICE_AUTH
+    - EXECUTE_ACTIONS_ERROR
+    - REMOVE_FEDERATED_IDENTITY
+    - IDENTITY_PROVIDER_POST_LOGIN
+    - IDENTITY_PROVIDER_LINK_ACCOUNT_ERROR
+    - FEDERATED_IDENTITY_OVERRIDE_LINK_ERROR
+    - OAUTH2_DEVICE_VERIFY_USER_CODE_ERROR
+    - UPDATE_EMAIL
+    - REGISTER_ERROR
+    - REVOKE_GRANT_ERROR
+    - EXECUTE_ACTION_TOKEN
+    - LOGOUT_ERROR
+    - UPDATE_EMAIL_ERROR
+    - CLIENT_UPDATE_ERROR
+    - AUTHREQID_TO_TOKEN_ERROR
+    - INVITE_ORG_ERROR
+    - UPDATE_PROFILE
+    - CLIENT_REGISTER_ERROR
+    - IDENTITY_PROVIDER_LOGIN_ERROR
+    - RESET_PASSWORD
+    - OAUTH2_DEVICE_AUTH_ERROR
+    - REMOVE_CREDENTIAL
+    - SEND_RESET_PASSWORD_ERROR
+    - CLIENT_UPDATE
+    - CODE_TO_TOKEN
+    - VERIFY_PROFILE
+  adminEventsEnabled: false
+  adminEventsDetailsEnabled: false
+
+  #############
+  # Identity
+  #############
+
+  identityProviders: [ ]
+  identityProviderMappers: [ ]
+  internationalizationEnabled: false
+  authenticationFlows: [ ]
+  authenticatorConfig: [ ]
+  directGrantFlow: direct grant
+  resetCredentialsFlow: reset credentials
+  clientAuthenticationFlow: clients
+  userManagedAccessAllowed: false
+  organizationsEnabled: false
+  verifiableCredentialsEnabled: false
+  adminPermissionsEnabled: false
+
+  attributes:
+    cibaBackchannelTokenDeliveryMode: poll
+    cibaExpiresIn: 120
+    cibaAuthRequestedUserHint: login_hint
+    oauth2DeviceCodeLifespan: 600
+    oauth2DevicePollingInterval: 5
+    parRequestUriLifespan: 60
+    cibaInterval: 5
+    realmReusableOtpCode: false
+
+  clientProfiles:
+    profiles: [ ]
+  clientPolicies:
+    policies: [ ]
+
+
+  #
+  ###
+  #
+
+  defaultRole:
+    name: *env_otago__default_roles
+    description: "${role_default-roles}"
+    composite: true
+    clientRole: false
+
+  clientScopes:
+  ###
+  # defaultDefaultClientScopes — это внутренний системный параметр Keycloak,
+  # который указывает на набор client scopes, которые применяются по умолчанию ко всем клиентам в данном Realm,
+  # если у клиента не заданы свои defaultClientScopes.
+  #
+  # В Keycloak есть глобальный набор client scopes, который применяется ко всем клиентам в Realm,
+  # если у клиента не определены свои defaultClientScopes.
+  # Этот набор хранится именно в defaultDefaultClientScopes (в realm настройки).
+  # Если у клиента есть свои defaultClientScopes, то именно они применяются, а не глобальные
+  ###
+  defaultDefaultClientScopes:
+    - role_list
+    - profile
+    - email
+    - roles
+    - basic
+
+  ###
+  # defaultOptionalClientScopes — это набор client scopes, которые назначаются по умолчанию как optional
+  # для всех клиентов в Realm, если у клиента не заданы свои собственные optionalClientScopes.
+  ###
+  defaultOptionalClientScopes:
+    - offline_access
+
+  scopeMappings:
+    - clientScope: offline_access
+      roles: [
+        "offline_access"
+      ]
+
+  clientScopeMappings:
+    $ot_cid:
+      - client: *env_otago__client_id
+        roles:
+          - *v_cv_regular_user_name
+          - *v_cv_admin_name
+
+
+
+  components:
+    org.keycloak.userprofile.UserProfileProvider:
+      - id: 0c53a406-0c53-7f45-bd2c-103dd76bab03
+        providerId: declarative-user-profile
+        subComponents: { }
+        config:
+          kc.user.profile.config:
+            - |
+              {
+                "attributes": [
+                  {
+                    "name": "username",
+                    "displayName": "${username}",
+                    "validations": {
+                      "length": { "min": 3, "max": 255 },
+                      "username-prohibited-characters": {},
+                      "up-username-not-idn-homograph": {}
+                    },
+                    "permissions": { "view": ["admin","user"], "edit": ["admin","user"] },
+                    "multivalued": false
+                  },
+                  {
+                    "name": "email",
+                    "displayName": "${email}",
+                    "validations": { "email": {}, "length": { "max": 255 } },
+                    "required": { "roles": ["user"] },
+                    "permissions": { "view": ["admin","user"], "edit": ["admin","user"] },
+                    "multivalued": false
+                  },
+                  {
+                    "name": "firstName",
+                    "displayName": "${firstName}",
+                    "validations": { "length": { "max": 255 }, "person-name-prohibited-characters": {} },
+                    "required": { "roles": ["user"] },
+                    "permissions": { "view": ["admin","user"], "edit": ["admin","user"] },
+                    "multivalued": false
+                  },
+                  {
+                    "name": "lastName",
+                    "displayName": "${lastName}",
+                    "validations": { "length": { "max": 255 }, "person-name-prohibited-characters": {} },
+                    "required": { "roles": ["user"] },
+                    "permissions": { "view": ["admin","user"], "edit": ["admin","user"] },
+                    "multivalued": false
+                  },
+                  {
+                    "name": "location",
+                    "displayName": "${location}",
+                    "validations": { "length": { "max": 255 } },
+                    "annotations": { "roles": ["user"] },
+                    "permissions": { "view": ["admin","user"], "edit": ["admin","user"] },
+                    "multivalued": false
+                  },
+                  {
+                    "name": "locationId",
+                    "displayName": "${locationId}",
+                    "validations": { "length": { "max": 255 } },
+                    "annotations": { "roles": ["user"] },
+                    "permissions": { "view": ["admin","user"], "edit": ["admin","user"] },
+                    "multivalued": false
+                  }
+                ],
+                "groups": [
+                  {
+                    "name": "user-metadata",
+                    "displayHeader": "User metadata",
+                    "displayDescription": "Attributes, which refer to user metadata"
+                  }
+                ]
+              }
+
+
+  roles:
+    client:
+      $ot_cid:
+
+        ###
+        - id: *v_cv_regular_user_id
+          name: *v_cv_regular_user_name
+          description: Пользовательская роль
+
+        ###
+        - id: *v_cv_admin_id
+          name: *v_cv_admin_name
+          description: Админ всей системы
+
+  clients:
+    ###
+    # пока мы ходим через админа - master realm
+    # эти клиенты вообще не нужны
+    ###
+    - clientId: account
+      enabled: false
+    - clientId: account-console
+      enabled: false
+    - clientId: admin-cli
+      enabled: false
+    - clientId: broker
+      enabled: false
+    - clientId: security-admin-console
+      enabled: false
+
+
+    ###
+    # Межсервисные клиенты
+    ###
+
+    - clientId: microservice-account
+      name: microservice-account
+      id: 4048a406-4048-79c5-b640-a42f44451952
+      secret: xJmvUOdIYyAW45LJmj32YrOWfnYqdXni
+
+      publicClient: false
+      protocol: openid-connect
+      description: Microservice account
+      enabled: true
+      clientAuthenticatorType: client-secret
+      standardFlowEnabled: false
+      directAccessGrantsEnabled: true
+      serviceAccountsEnabled: true
+      defaultRoles:
+      defaultClientScopes:
+        - service_account
+        - roles
+      optionalClientScopes: [ ]
+      protocolMappers: [ ]
+      authorizationServicesEnabled: false
+    #      authorizationSettings: [ ]
+
+    ###
+    # Эти клиенты нужны для ролевки и доступов
+    ###
+    - clientId: realm-management
+      name: '${client_realm-management}'
+      surrogateAuthRequired: false
+      enabled: true
+      alwaysDisplayInConsole: false
+      clientAuthenticatorType: client-secret
+      redirectUris: [ ]
+      webOrigins: [ ]
+      notBefore: 0
+      bearerOnly: true
+      consentRequired: false
+      standardFlowEnabled: true
+      implicitFlowEnabled: false
+      directAccessGrantsEnabled: false
+      serviceAccountsEnabled: false
+      publicClient: false
+      frontchannelLogout: false
+      protocol: openid-connect
+      attributes:
+        realm_client: true
+      authenticationFlowBindingOverrides: { }
+      fullScopeAllowed: false
+      nodeReRegistrationTimeout: 0
+      defaultClientScopes:
+        - service_account
+        - roles
+        - basic
+        - email
+      optionalClientScopes: [ ]
+
+    - clientId: *env_otago__client_id
+      name: *env_otago__name
+      id: *env_otago__id
+      secret: *env_otago__secret
+
+      ###
+      # Означает, что клиент является публичным — не может хранить секреты безопасно
+      # (например, это SPA или мобильное приложение).
+      ###
+      publicClient: false
+      protocol: openid-connect
+      description: Backend Resource Service Client
+      enabled: true
+      clientAuthenticatorType: client-secret
+      standardFlowEnabled: false
+
+      ###
+      # Это механизм аутентификации по протоколу OAuth2, также известный как Resource Owner Password Credentials Grant.
+      # Позволяет клиенту получить токен доступа, отправив напрямую логин и пароль пользователя
+      # (то есть клиент получает username и password и передаёт их Keycloak).
+      # Используется, когда пользователь вводит логин и пароль в самом клиентском приложении,
+      # а не через браузер или перенаправление.
+      ###
+      directAccessGrantsEnabled: true
+
+      ###
+      # Когда ты включаешь serviceAccountsEnabled: true для клиента,
+      # Keycloak создаёт специального пользователя, связанного с этим клиентом. Этот сервисный аккаунт может:
+      #
+      # - Аутентифицироваться без участия пользователя
+      # - Получать токены
+      # - Действовать от своего имени (например, обращаться к Admin API)
+      ###
+      serviceAccountsEnabled: true
+
+      #####
+      # serviceAccountsEnabled: true
+      #
+      # Включает вкладку Authorization для этого клиента в админке.
+      # Позволяет создавать:
+      # - Resources (ресурсы — например, document, project, API endpoint)
+      # - Scopes (действия — например, view, edit, delete)
+      # - Policies (правила — например, "только админ может удалять", или "владелец ресурса может редактировать")
+      # - Permissions (связь ресурс + scope + policy)
+      #####
+      authorizationServicesEnabled: true
+
+      defaultRoles:
+        - *v_cv_regular_user_name
+
+      ###
+      # Параметр defaultClientScopes в Keycloak используется для указания наборов client scopes,
+      # которые автоматически применяются к клиенту при аутентификации.
+      # Это влияет на то, что включается в токены, которые Keycloak выдает клиенту (ID token, Access token, и т.д.).
+      ###
+      defaultClientScopes:
+        - email
+        - roles
+
+      ###
+      # optionalClientScopes в Keycloak — это список client scopes, которые не применяются автоматически,
+      # а добавляются только если явно указаны в параметре scope при аутентификации.
+      ###
+      optionalClientScopes: [ ]
+
+
+      protocolMappers:
+        - name: email
+          protocol: openid-connect
+          protocolMapper: oidc-usermodel-attribute-mapper
+          consentRequired: false
+          config:
+            introspection.token.claim: true
+            userinfo.token.claim: true
+            user.attribute: email
+            id.token.claim: true
+            access.token.claim: true
+            claim.name: email
+            jsonType.label: String
+
+        - name: username
+          protocol: openid-connect
+          protocolMapper: oidc-usermodel-property-mapper
+          consentRequired: false
+          config:
+            userinfo.token.claim: true
+            user.attribute: username
+            id.token.claim: false
+            access.token.claim: false
+            claim.name: username
+            jsonType.label: String
+
+        - name: firstName
+          protocol: openid-connect
+          protocolMapper: oidc-usermodel-property-mapper
+          consentRequired: false
+          config:
+            userinfo.token.claim: true
+            user.attribute: firstName
+            id.token.claim: false
+            access.token.claim: false
+            claim.name: firstName
+            jsonType.label: String
+
+        - name: lastName
+          protocol: openid-connect
+          protocolMapper: oidc-usermodel-property-mapper
+          consentRequired: false
+          config:
+            userinfo.token.claim: true
+            user.attribute: lastName
+            id.token.claim: false
+            access.token.claim: false
+            claim.name: lastName
+            jsonType.label: String
+
+        - name: sub
+          protocol: openid-connect
+          protocolMapper: oidc-usermodel-property-mapper
+          consentRequired: false
+          config:
+            user.attribute: id
+            claim.name: sub
+            jsonType.label: String
+            id.token.claim: true
+            access.token.claim: true
+            userinfo.token.claim: true
+
+        - name: locationId
+          protocol: openid-connect
+          protocolMapper: oidc-usermodel-attribute-mapper
+          consentRequired: false
+          config:
+            introspection.token.claim: true
+            userinfo.token.claim: true
+            user.attribute: locationId
+            id.token.claim: true
+            access.token.claim: true
+            claim.name: attributes.locationId
+            jsonType.label: String
+
+        - name: location
+          protocol: openid-connect
+          protocolMapper: oidc-usermodel-attribute-mapper
+          consentRequired: false
+          config:
+            introspection.token.claim: true
+            userinfo.token.claim: true
+            user.attribute: location
+            id.token.claim: true
+            access.token.claim: true
+            claim.name: attributes.location
+            jsonType.label: String
+
+      authorizationSettings:
+        allowRemoteResourceManagement: true
+        policyEnforcementMode: ENFORCING
+        decisionStrategy: UNANIMOUS
+
+        ###
+        scopes:
+          ###
+          - name: *v_scp_view
+            displayName: Просмотр раздела
+
+          ###
+          - name: *v_scp_update
+            displayName: Редактирование раздела
+
+        ###
+        resources:
+          ##################
+          # Resources:Roles
+          ##################
+
+          ###
+          - name: *v_res_roles_section
+            uri: *v_res_roles_section
+            type: *v_res_urn_section
+            displayName: Роли
+            <<: *v_s_vu
+
+          ##################
+          # Resources:Users
+          ##################
+
+          ###
+          - name: *v_res_users_section
+            uri: *v_res_users_section
+            type: *v_res_urn_section
+            displayName: Пользователи
+            <<: *v_s_vu
+
+          ###
+          - name: *v_res_users_objects
+            uri: *v_res_users_objects
+            type: *v_res_urn_user
+            displayName: Пользователи (Объекты)
+            <<: *v_s_vu
+
+        policies:
+          ### Roles permissions ###
+
+          #########
+          # Roles
+          #########
+
+          ###
+          - name: *v_pv_superadmin_name
+            config:
+              roles:
+                - id: *v_cv_admin_id
+            <<: *v_dps_p_role
+
+          ###
+          - name: *v_pv_regular_user_name
+            config:
+              roles:
+                - id: *v_cv_regular_user_id
+            <<: *v_dps_p_role
+
+          - id: "7e05a406-7e05-7e95-b830-e31cc644331c"
+            name: *v_pv_deny_all
+            type: time
+            logic: NEGATIVE
+            decisionStrategy: UNANIMOUS
+            config:
+              noa: "2200-01-01 00:00:00"
+              nbf: "1981-01-01 01:00:00"
+
+          ###################################################
+          # Permissions:Sections&Objects
+          # scope-based on resource    [Priority 1]
+          # resource-based on resource [Priority 1]
+          ###################################################
+
+          ###########################################
+          # Permissions:Roles
+          ###########################################
+
+          ## Sections: VU
+
+          ###
+          - name: roles:view
+            resources:
+              - *v_res_roles_section
+            scopes:
+              - *v_scp_view
+            <<: *v_dps_p_scope_based_on_section_resource_permission
+
+          ###
+          - name: roles:update
+            resources:
+              - *v_res_roles_section
+            scopes:
+              - *v_scp_update
+            <<: *v_dps_p_scope_based_on_section_resource_permission
+
+          ####################
+          # Permissions:Users
+          ####################
+
+          ## Sections: VU
+
+          ###
+          - name: view:users:section
+            resources:
+              - *v_res_users_section
+            scopes:
+              - *v_scp_view
+            <<: *v_dps_p_scope_based_on_section_resource_permission
+
+          ###
+          - name: update:users:section
+            resources:
+              - *v_res_users_section
+            scopes:
+              - *v_scp_update
+            <<: *v_dps_p_scope_based_on_section_resource_permission
+
+          ## Objects: VU
+
+          ###
+          - name: view:users:objects
+            resources:
+              - *v_res_users_objects
+            scopes:
+              - *v_scp_view
+            <<: *v_dps_p_scope_based_on_objects_resource_permission
+
+          ###
+          - name: update:users:objects
+            resources:
+              - *v_res_users_objects
+            scopes:
+              - *v_scp_update
+            <<: *v_dps_p_scope_based_on_objects_resource_permission
+
+
+
+  users:
+    - username: *env_otago__service_account
+      emailVerified: false
+      enabled: true
+      createdTimestamp: 1667974627111
+      totp: false
+      serviceAccountClientId: *env_otago__client_id
+      disableableCredentialTypes: [ ]
+      requiredActions: [ ]
+      realmRoles:
+        - *env_otago__default_roles
+      clientRoles:
+        realm-management:
+          - manage-clients
+          - manage-users
+          - manage-roles
+          - manage-authorization
+        $ot_cid:
+          - uma_protection
+      notBefore: 0
+      groups: [ ]
+
+    - id: a5ada406-a5ad-75f1-b0d1-1f19fb3f11b1
+      username: admin
+      email: admin@example.com
+      firstName: Ivan
+      clientRoles:
+        $ot_cid:
+          - *v_cv_admin_name
+      <<: *v_dps_user
+
+    - id: b8b1a406-b8b1-78e6-a0e7-618f997aa57c
+      username: user
+      email: user@example.com
+      firstName: Steve
+      clientRoles:
+        $ot_cid:
+          - *v_cv_regular_user_name
+      <<: *v_dps_user

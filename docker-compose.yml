@@ -1,0 +1,31 @@
+services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.3.3
+    container_name: keycloak
+    command: start-dev #--import-realm
+    environment:
+      KC_LOG_LEVEL: ${KEYCLOAK_INSTANCE_LOGLEVEL:-ERROR}
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_INSTANCE_USERNAME:-admin}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_INSTANCE_PASSWORD:-admin}
+      KEYCLOAK_INSTANCE_URL: ${KEYCLOAK_INSTANCE_URL}
+      KC_DB: ${KEYCLOAK_INSTANCE_DB_TYPE:-dev-mem}
+      JAVA_OPTS_APPEND: "
+        -Dquarkus.http.limits.max-body-size=20M
+        -Dquarkus.http.limits.max-form-attribute-size=10M
+        -Dresteasy.embedded.parameter.split.limit=3000
+      "
+    ports:
+      - "${KEYCLOAK_INSTANCE_PORT:-8089}:8080"
+    networks:
+      - keycloak-net
+    volumes:
+      - ./data/realms/templates:/opt/keycloak/data/templates
+      - ./data/realms/export:/opt/keycloak/data/export
+      - ./bin/realm_upload:/opt/keycloak/bin/realm_upload
+    restart: unless-stopped
+volumes:
+  keycloak-db-data:
+
+networks:
+  keycloak-net:
+    driver: bridge
