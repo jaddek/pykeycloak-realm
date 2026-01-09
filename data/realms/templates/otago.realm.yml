@@ -337,16 +337,7 @@ realm:
     clientRole: false
 
   clientScopes:
-  ###
-  # defaultDefaultClientScopes — это внутренний системный параметр Keycloak,
-  # который указывает на набор client scopes, которые применяются по умолчанию ко всем клиентам в данном Realm,
-  # если у клиента не заданы свои defaultClientScopes.
-  #
-  # В Keycloak есть глобальный набор client scopes, который применяется ко всем клиентам в Realm,
-  # если у клиента не определены свои defaultClientScopes.
-  # Этот набор хранится именно в defaultDefaultClientScopes (в realm настройки).
-  # Если у клиента есть свои defaultClientScopes, то именно они применяются, а не глобальные
-  ###
+
   defaultDefaultClientScopes:
     - role_list
     - profile
@@ -354,10 +345,6 @@ realm:
     - roles
     - basic
 
-  ###
-  # defaultOptionalClientScopes — это набор client scopes, которые назначаются по умолчанию как optional
-  # для всех клиентов в Realm, если у клиента не заданы свои собственные optionalClientScopes.
-  ###
   defaultOptionalClientScopes:
     - offline_access
 
@@ -373,8 +360,6 @@ realm:
         roles:
           - *v_cv_regular_user_name
           - *v_cv_admin_name
-
-
 
   components:
     org.keycloak.userprofile.UserProfileProvider:
@@ -463,10 +448,6 @@ realm:
           description: Админ всей системы
 
   clients:
-    ###
-    # пока мы ходим через админа - master realm
-    # эти клиенты вообще не нужны
-    ###
     - clientId: account
       enabled: false
     - clientId: account-console
@@ -478,36 +459,6 @@ realm:
     - clientId: security-admin-console
       enabled: false
 
-
-    ###
-    # Межсервисные клиенты
-    ###
-
-    - clientId: microservice-account
-      name: microservice-account
-      id: 4048a406-4048-79c5-b640-a42f44451952
-      secret: xJmvUOdIYyAW45LJmj32YrOWfnYqdXni
-
-      publicClient: false
-      protocol: openid-connect
-      description: Microservice account
-      enabled: true
-      clientAuthenticatorType: client-secret
-      standardFlowEnabled: false
-      directAccessGrantsEnabled: true
-      serviceAccountsEnabled: true
-      defaultRoles:
-      defaultClientScopes:
-        - service_account
-        - roles
-      optionalClientScopes: [ ]
-      protocolMappers: [ ]
-      authorizationServicesEnabled: false
-    #      authorizationSettings: [ ]
-
-    ###
-    # Эти клиенты нужны для ролевки и доступов
-    ###
     - clientId: realm-management
       name: '${client_realm-management}'
       surrogateAuthRequired: false
@@ -542,68 +493,21 @@ realm:
       name: *env_otago__name
       id: *env_otago__id
       secret: *env_otago__secret
-
-      ###
-      # Означает, что клиент является публичным — не может хранить секреты безопасно
-      # (например, это SPA или мобильное приложение).
-      ###
       publicClient: false
       protocol: openid-connect
       description: Backend Resource Service Client
       enabled: true
       clientAuthenticatorType: client-secret
       standardFlowEnabled: false
-
-      ###
-      # Это механизм аутентификации по протоколу OAuth2, также известный как Resource Owner Password Credentials Grant.
-      # Позволяет клиенту получить токен доступа, отправив напрямую логин и пароль пользователя
-      # (то есть клиент получает username и password и передаёт их Keycloak).
-      # Используется, когда пользователь вводит логин и пароль в самом клиентском приложении,
-      # а не через браузер или перенаправление.
-      ###
       directAccessGrantsEnabled: true
-
-      ###
-      # Когда ты включаешь serviceAccountsEnabled: true для клиента,
-      # Keycloak создаёт специального пользователя, связанного с этим клиентом. Этот сервисный аккаунт может:
-      #
-      # - Аутентифицироваться без участия пользователя
-      # - Получать токены
-      # - Действовать от своего имени (например, обращаться к Admin API)
-      ###
       serviceAccountsEnabled: true
-
-      #####
-      # serviceAccountsEnabled: true
-      #
-      # Включает вкладку Authorization для этого клиента в админке.
-      # Позволяет создавать:
-      # - Resources (ресурсы — например, document, project, API endpoint)
-      # - Scopes (действия — например, view, edit, delete)
-      # - Policies (правила — например, "только админ может удалять", или "владелец ресурса может редактировать")
-      # - Permissions (связь ресурс + scope + policy)
-      #####
       authorizationServicesEnabled: true
-
       defaultRoles:
         - *v_cv_regular_user_name
-
-      ###
-      # Параметр defaultClientScopes в Keycloak используется для указания наборов client scopes,
-      # которые автоматически применяются к клиенту при аутентификации.
-      # Это влияет на то, что включается в токены, которые Keycloak выдает клиенту (ID token, Access token, и т.д.).
-      ###
       defaultClientScopes:
         - email
         - roles
-
-      ###
-      # optionalClientScopes в Keycloak — это список client scopes, которые не применяются автоматически,
-      # а добавляются только если явно указаны в параметре scope при аутентификации.
-      ###
       optionalClientScopes: [ ]
-
-
       protocolMappers:
         - name: email
           protocol: openid-connect
