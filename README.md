@@ -7,6 +7,7 @@
    - [Commands](#commands)
    - [Configs](#configs)
    - [Docker](#docker)
+   - [Tests](#tests)
 2. [Methodology for Defining Realm Configurations](#methodology*for*defining*realm*configurations)
    - [Sections](#sections*envs*vars*realms)
    - [Envs](#envs)
@@ -121,6 +122,10 @@ make dup # up docker container with keycloak
 make dd  # down docker container
 ...
 ```
+
+## Tests
+
+`make tests` - run tests
 
 ---
 
