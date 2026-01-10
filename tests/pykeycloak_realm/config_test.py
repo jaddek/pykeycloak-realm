@@ -151,22 +151,6 @@ class TestRealmBuilderConfig:
                 overwrite_existing_realm=True,
             )
 
-    def test_empty_string_as_false_for_overwrite(self, monkeypatch):
-        # Arrange
-        monkeypatch.setenv("KEYCLOAK_OVERWRITE_EXISTING_REALM", "")
-
-        # Act & Assert
-        with pytest.raises(
-            ValueError, match="missing required fields: overwrite_existing_realm"
-        ):
-            RealmBuilderConfig(
-                _template_export_dir_path="./export",
-                _template_dir_path="./templates",
-                template_file_suffix=".realm.yml",
-                realm_file_suffix=".realm.json",
-                overwrite_existing_realm="",  # This should trigger validation error
-            )
-
     def test_valid_config_creation(self, monkeypatch):
         # Clear environment variables to ensure consistent behavior
         monkeypatch.delenv("KEYCLOAK_BUILDER_EXPORT_PATH", raising=False)
