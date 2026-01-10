@@ -16,6 +16,10 @@
 
 # Pykeycloak Realm Builder
 
+This library allows you to split the configuration and assemble a Keycloak realm configuration.
+
+It is especially useful for local development, when you need a full Keycloak instance running on your local machine for testing, and later upload it to your local Keycloak instance, a containerized Keycloak, or your own Keycloak instance running on a server.
+
 ## Special Note
 
 Keycloak validation is weird. When you upload a realm configuration file, you never get a detailed error explaining
