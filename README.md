@@ -26,6 +26,8 @@ Keycloak validation is weird. When you upload a realm configuration file, you ne
 what’s wrong. It just reports vague issues like duplicated resources or invalid JSON, even when the JSON file itself is
 valid.
 
+`otago.realm.yml` is provided as an example for future realms and **should not be used** in production.
+
 ## Data directory
 
 The default structure consists of two main directories for different purposes:
@@ -100,7 +102,9 @@ All configs here
 ./src/pykeycloak_realm/config.py
 ```
 
-You can manage them using system environment or .env files
+You can manage them using system environment variables or .env files.
+
+.env files are supported only via Makefiles (no dotenv dependencies are used); in other cases, they are intended as helper files for environment setup.
 
 ```text
 .env        # All variables available for configuring
