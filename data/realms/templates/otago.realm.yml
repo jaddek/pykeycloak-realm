@@ -1,3 +1,5 @@
+#====================== ENVS ========================
+
 envs:
   rn: &env_realm_name "otago"
   rdn: &env_realm_display_name "OTAGO"
@@ -11,21 +13,25 @@ envs:
       cs: &env_otago__secret "rJhU44w9JpYjV7C2bRllVLdXSHI27gW5"
       dr: &env_otago__default_roles "default-roles-otago"
       sa: &env_otago__service_account "service-account-otago_proxy_service_client"
+
+#====================== VARS ========================
+
 vars:
-  # decision strategy = ds
-  v_ds_p: &v_ds_positive "POSITIVE"
+  decision_strategies:
+    v_ds_p: &v_ds_positive "POSITIVE"
+    v_ds_a: &v_ds_affirmative "AFFIRMATIVE"
+    v_ds_n: &v_ds_unanimous "UNANIMOUS"
 
-  # permission resource = pr
-  v_pr: &v_perm_rsrc "resource"
-  # permission scope = pr
-  v_ps: &v_perm_scp  "scope"
+  permissions:
+    # permission resource = pr
+    v_pr: &v_perm_rsrc "resource"
+    # permission scope = pr
+    v_ps: &v_perm_scp  "scope"
 
-  # decision strategy affirmative = dsa
-  v_ds_a: &v_ds_affirmative "AFFIRMATIVE"
-
-  # resource urn = resu
-  v_resu_s: &v_res_urn_section "urn:section"
-  v_resu_u: &v_res_urn_user "urn:user"
+  resource_urns:
+    # resource urn = resu
+    v_resu_s: &v_res_urn_section "urn:section"
+    v_resu_u: &v_res_urn_user "urn:user"
 
 
   client_roles: # v_clr = var client role; v_pl = var policy role
@@ -41,6 +47,9 @@ vars:
 
       ###
       v_pl_da: &v_pv_deny_all "system_policy_time__deny_all"
+
+  components:
+     upp: &v_c_user_profile_provider "0c53a406-0c53-7f45-bd2c-103dd76bab03"
 
   scopes: # v_scp = var scopes
     v_v: &v_scp_view "view"
@@ -66,26 +75,23 @@ vars:
         username: user
         email: user@example.com
         firstName: Steve
-  ################################
-  # Default partial structs (dps)
-  ################################
 
   auth:
     ###
     resources:
       scopes:
       ###
-      # _vu_ view (v); update (u);
+      # _v view (v); _vu update (u);
       ###
 
       ###
-      v_ds_vu: &v_s_vu
+      v_ars_vu: &v_ars_vu
         scopes:
           - *v_scp_view
           - *v_scp_update
 
       ###
-      v_ds_v: &v_s_v
+      v_ars_v: &v_ars_v
         scopes:
           - *v_scp_view
 
@@ -135,7 +141,6 @@ realm:
   keycloakVersion: *env_realm_keycloak_version
   enabled: true
 
-  # Default значения создания realm
   defaultSignatureAlgorithm: RS256
   revokeRefreshToken: false
   refreshTokenMaxReuse: 0
@@ -375,7 +380,7 @@ realm:
 
   components:
     org.keycloak.userprofile.UserProfileProvider:
-      - id: 0c53a406-0c53-7f45-bd2c-103dd76bab03
+      - id: *v_c_user_profile_provider
         providerId: declarative-user-profile
         subComponents: { }
         config:
@@ -611,17 +616,17 @@ realm:
       authorizationSettings:
         allowRemoteResourceManagement: true
         policyEnforcementMode: ENFORCING
-        decisionStrategy: UNANIMOUS
+        decisionStrategy: *v_ds_unanimous
 
         ###
         scopes:
           ###
           - name: *v_scp_view
-            displayName: Просмотр раздела
+            displayName: View Scope
 
           ###
           - name: *v_scp_update
-            displayName: Редактирование раздела
+            displayName: Update Scope
 
         ###
         resources:
@@ -633,8 +638,8 @@ realm:
           - name: *v_res_roles_section
             uri: *v_res_roles_section
             type: *v_res_urn_section
-            displayName: Роли
-            <<: *v_s_vu
+            displayName: Roles
+            <<: *v_ars_vu
 
           ##################
           # Resources:Users
@@ -644,15 +649,15 @@ realm:
           - name: *v_res_users_section
             uri: *v_res_users_section
             type: *v_res_urn_section
-            displayName: Пользователи
-            <<: *v_s_vu
+            displayName: Users
+            <<: *v_ars_vu
 
           ###
           - name: *v_res_users_objects
             uri: *v_res_users_objects
             type: *v_res_urn_user
-            displayName: Пользователи (Объекты)
-            <<: *v_s_vu
+            displayName: Users (Entities)
+            <<: *v_ars_vu
 
         policies:
           ### Roles permissions ###
@@ -679,7 +684,7 @@ realm:
             name: *v_pv_deny_all
             type: time
             logic: NEGATIVE
-            decisionStrategy: UNANIMOUS
+            decisionStrategy: *v_ds_unanimous
             config:
               noa: "2200-01-01 00:00:00"
               nbf: "1981-01-01 01:00:00"

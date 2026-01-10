@@ -10,9 +10,9 @@ services:
       KEYCLOAK_INSTANCE_URL: ${KEYCLOAK_INSTANCE_URL}
       KC_DB: ${KEYCLOAK_INSTANCE_DB_TYPE:-dev-mem}
       JAVA_OPTS_APPEND: "
-        -Dquarkus.http.limits.max-body-size=20M
-        -Dquarkus.http.limits.max-form-attribute-size=10M
-        -Dresteasy.embedded.parameter.split.limit=3000
+        -Dquarkus.http.limits.max-body-size=5M
+        -Dquarkus.http.limits.max-form-attribute-size=5M
+        -Dresteasy.embedded.parameter.split.limit=1000
       "
     ports:
       - "${KEYCLOAK_INSTANCE_PORT:-8089}:8080"
