@@ -54,6 +54,18 @@ vars:
     # Roles
     v_rrs: &v_res_roles_section "/otago/roles"
 
+  users:
+    - admin: &v_u_admin_attrs
+        id: a5ada406-a5ad-75f1-b0d1-1f19fb3f11b1
+        username: admin
+        email: admin@example.com
+        firstName: Ivan
+
+    - user: &v_u_user_attrs
+        id: b8b1a406-b8b1-78e6-a0e7-618f997aa57c
+        username: user
+        email: user@example.com
+        firstName: Steve
   ################################
   # Default partial structs (dps)
   ################################
@@ -102,9 +114,9 @@ vars:
           - *v_pv_superadmin_name
 
   ###
-  # v_dps_r = var default partial struct: user
+  # v_d = var default user attrs
   ###
-  users: &v_dps_user
+  dps_user: &v_d_user_attrs
     enabled: true
     emailVerified: true
     lastName: Keycloak
@@ -113,7 +125,7 @@ vars:
         value: password
         temporary: false
 
-
+#====================== REALM ========================
 
 
 realm:
@@ -725,7 +737,7 @@ realm:
           ## Objects: VU
 
           ###
-          - name: view:users:objects
+          - name: view:user:object
             resources:
               - *v_res_users_objects
             scopes:
@@ -733,7 +745,7 @@ realm:
             <<: *v_dps_p_scope_based_on_objects_resource_permission
 
           ###
-          - name: update:users:objects
+          - name: update:user:object
             resources:
               - *v_res_users_objects
             scopes:
@@ -764,20 +776,14 @@ realm:
       notBefore: 0
       groups: [ ]
 
-    - id: a5ada406-a5ad-75f1-b0d1-1f19fb3f11b1
-      username: admin
-      email: admin@example.com
-      firstName: Ivan
-      clientRoles:
+    - clientRoles:
         $ot_cid:
           - *v_cv_admin_name
-      <<: *v_dps_user
+      <<: *v_d_user_attrs
+      <<: *v_u_admin_attrs
 
-    - id: b8b1a406-b8b1-78e6-a0e7-618f997aa57c
-      username: user
-      email: user@example.com
-      firstName: Steve
-      clientRoles:
+    - clientRoles:
         $ot_cid:
           - *v_cv_regular_user_name
-      <<: *v_dps_user
+      <<: *v_d_user_attrs
+      <<: *v_u_user_attrs
