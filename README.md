@@ -52,8 +52,7 @@ make install
 
 ## Dependencies
 
-- `poe` - as uv doesn't support custom scripts
-- `PyYAML`
+- no specific dependencies
 
 ## Commands
 
@@ -66,11 +65,11 @@ make install
 PYTHONPATH=src bin/realm_builder --from-realm otago --to-realm otago
 ```
 
-### For UV + Poe environment
+### For UV
 
 ```sh
 
-uv run poe rb --from-realm=otago --to-realm=otago - will generate a new config
+uv run python src/pykeycloak_realm/realm.py --from-realm=otago --to-realm=otago - will generate a new config
 ```
 
 ### Shortcuts using MAKE

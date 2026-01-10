@@ -22,8 +22,8 @@ DOCKER_ENV_FILES := $(foreach f,$(APP_ENV_FILES),--env-file $f)
 PY_RUN := make set-python-version;\
 	PYTHONPATH=src uv run
 
-POE_RUN := make set-python-version;\
-	PYTHONPATH=src uv run poe
+REALM_RUN := make set-python-version;\
+	PYTHONPATH=src uv run python src/pykeycloak_realm/realm.py
 
 DC := docker compose
 PYTHON_VER := $(shell tr -d '\n' < .python-version)
@@ -88,7 +88,7 @@ clean: ## Remove .pyc files and pre-commit cache
 # ========================
 
 run-gen-realm: ## Run Realm Generator
-	@$(load_env); $(POE_RUN) rb
+	@$(load_env); $(REALM_RUN) rb
 
 # ========================
 # Formatting & Linting
@@ -156,7 +156,7 @@ docker-kc-build-realm-%: ## Import generated data to keycloak
 	@python3 -c 'print("\n")'
 	@python3 -c 'print("-" * 55)'
 	@echo "===+> Transform data from YAML to JSON: ./data/realms/templates/$*.realm.yml"
-	@$(load_env); $(POE_RUN) rb --from-realm $* --to-realm $*
+	@$(load_env); $(REALM_RUN) --from-realm $* --to-realm $*
 	@echo "===+>  ✅ Realm transformation completed at ./data/realms/export/$*.realm.json ✅"
 	@make docker-kc-export-realm-$*
 	@python3 -c 'print("\n")'

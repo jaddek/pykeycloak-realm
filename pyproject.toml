@@ -1,7 +1,7 @@
 [project]
 name = "pykeycloak-realm"
 version = "0.1.0"
-description = ""
+description = "A library for splitting and assembling Keycloak realm configurations."
 readme = "README.md"
 requires-python = ">=3.12,<3.15"
 license = {text = "MIT"}
@@ -14,10 +14,6 @@ maintainers = [
 classifiers = [
 ]
 keywords = ["keycloak", "oauth", "openid", "authentication", "authorization", "async", "realm", "generator"]
-
-dependencies = [
-    "poethepoet>=0.40.0",
-]
 
 [tool.black]
 line-length = 88
@@ -131,8 +127,3 @@ lint = [
 test = [
     "pytest>=9.0.2",
 ]
-
-
-[tool.poe.tasks]
-realm-build = "uv run python src/pykeycloak_realm/realm.py"
-rb          = "uv run python src/pykeycloak_realm/realm.py"
