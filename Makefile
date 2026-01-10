@@ -164,8 +164,8 @@ docker-kc-build-realm-%: ## Import generated data to keycloak
 # ========================
 # Tests
 # ========================
-#tests: ## Run all tests
-#	@$(load_env); $(PY_RUN) pytest tests -vv -s
+tests: ## Run all tests
+	@$(load_env); $(PY_RUN) pytest tests -vv -s
 
 
 # =========

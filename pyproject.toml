@@ -16,7 +16,6 @@ classifiers = [
 keywords = ["keycloak", "oauth", "openid", "authentication", "authorization", "async", "realm", "generator"]
 
 dependencies = [
-    "click>=8.3.1",
     "poethepoet>=0.40.0",
 ]
 
@@ -109,17 +108,29 @@ markers = [
     "integration: integration tests",
     "unit: unit tests",
 ]
-asyncio_mode = "auto"
+
 filterwarnings = [
     "error",
     "ignore::DeprecationWarning",
 ]
 
-fail_under = 80
 
 [build-system]
 requires = ["uv_build>=0.9.9,<0.10.0"]
 build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+  {include-group = "lint"},
+  {include-group = "test"}
+]
+lint = [
+    "mypy>=1.19.1",
+    "ruff>=0.14.11",
+]
+test = [
+    "pytest>=9.0.2",
+]
 
 
 [tool.poe.tasks]

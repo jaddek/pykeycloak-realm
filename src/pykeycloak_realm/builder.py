@@ -83,7 +83,13 @@ class RealmTransformer:
         return realm
 
     def _inject_client_secrets(self, realm: JsonDict) -> JsonDict:
-        env_clients = self.envs.get("clients", {})
+        env_clients_list = self.envs.get("clients", [])
+        # Convert list to dictionary for easier lookup by clientId
+        env_clients = {
+            client.get("clientId"): client
+            for client in env_clients_list
+            if client.get("clientId")
+        }
 
         clients = [
             client
@@ -137,10 +143,12 @@ class RealmTransformer:
         if not replacements:
             return realm
 
-        return deep_replace(realm, replacements)
+        return deep_replace(realm, replacements)  # type: ignore[no-any-return]
 
 
-def create_realm_config_file(template_name: str, config: RealmBuilderConfig) -> dict:
+def create_realm_config_file(
+    template_name: str, config: RealmBuilderConfig
+) -> dict[str, Any]:
     template = template_load(
         template_name=template_name,
         template_suffix=config.template_file_suffix,
@@ -150,7 +158,7 @@ def create_realm_config_file(template_name: str, config: RealmBuilderConfig) -> 
     return RealmTransformer(template).apply()
 
 
-def export(from_template: str, to_file: str, config: RealmBuilderConfig):
+def export(from_template: str, to_file: str, config: RealmBuilderConfig) -> None:
     realm_data = create_realm_config_file(template_name=from_template, config=config)
 
     write_to_realm_import_file(

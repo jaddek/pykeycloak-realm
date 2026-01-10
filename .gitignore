@@ -12,3 +12,4 @@ wheels/
 
 # data
 data/realms/export
+.python-version

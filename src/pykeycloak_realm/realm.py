@@ -5,7 +5,7 @@ from pykeycloak_realm.builder import export
 from pykeycloak_realm.config import RealmBuilderConfig
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(
         description="Export a Keycloak realm from a template to a JSON file."
     )
