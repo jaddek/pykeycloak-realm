@@ -1,15 +1,16 @@
 
-1. [Realm Builder pykeycloak](#pykeycloak*realm*builder)
-   - [Special Note](#special*note)
-   - [Data directory](#data*directory)
+1. [Realm Builder pykeycloak](#pykeycloak-realm-builder)
+   - [Special Note](#special-note)
+   - [How it works](#how-it-works)
+   - [Data directory](#data-directory)
    - [Install](#install)
    - [Dependencies](#dependencies)
    - [Commands](#commands)
    - [Configs](#configs)
    - [Docker](#docker)
    - [Tests](#tests)
-2. [Methodology for Defining Realm Configurations](#methodology*for*defining*realm*configurations)
-   - [Sections](#sections*envs*vars*realms)
+2. [Methodology for Defining Realm Configurations](#methodology-for-defining-realm-configurations)
+   - [Sections](#sections-envs-vars-realms)
    - [Envs](#envs)
    - [Vars](#vars)
    - [Realms](#realms)
@@ -28,6 +29,10 @@ what’s wrong. It just reports vague issues like duplicated resources or invali
 valid.
 
 `otago.realm.yml` is provided as an example for future realms and **should not be used** in production.
+
+## How it works
+
+1. `./data/realms/templates/otago.realm.yml` - keycloak template
 
 ## Data directory
 

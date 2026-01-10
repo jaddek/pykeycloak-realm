@@ -6,13 +6,13 @@ envs:
   rdnh: &env_realm_display_name_html "OTAGO"
   rkv: &env_realm_keycloak_version "26.3.3"
   clients:
-    - id: &env_otago__id "e9c0a406-e9c0-72b7-8924-aedcd8e306e0"
-      cid: &env_otago__client_id "otago_proxy_service_client"
+    - id: &env_otago_client_uuid "e9c0a406-e9c0-72b7-8924-aedcd8e306e0"
+      cid: &env_otago_client_id "otago_proxy_service_client"
       cid_alias: "ot_cid"
-      cn: &env_otago__name "Otago proxy service client"
-      cs: &env_otago__secret "rJhU44w9JpYjV7C2bRllVLdXSHI27gW5"
-      dr: &env_otago__default_roles "default-roles-otago"
-      sa: &env_otago__service_account "service-account-otago_proxy_service_client"
+      cn: &env_otago_client_name "Otago proxy service client"
+      cs: &env_otago_client_secret "rJhU44w9JpYjV7C2bRllVLdXSHI27gW5"
+      dr: &env_otago_client_default_roles "default-roles-otago"
+      sa: &env_otago_client_service_account "service-account-otago_proxy_service_client"
 
 #====================== VARS ========================
 
@@ -348,7 +348,7 @@ realm:
   #
 
   defaultRole:
-    name: *env_otago__default_roles
+    name: *env_otago_client_default_roles
     description: "${role_default-roles}"
     composite: true
     clientRole: false
@@ -373,7 +373,7 @@ realm:
 
   clientScopeMappings:
     $ot_cid:
-      - client: *env_otago__client_id
+      - client: *env_otago_client_id
         roles:
           - *v_cv_regular_user_name
           - *v_cv_admin_name
@@ -506,10 +506,10 @@ realm:
         - email
       optionalClientScopes: [ ]
 
-    - clientId: *env_otago__client_id
-      name: *env_otago__name
-      id: *env_otago__id
-      secret: *env_otago__secret
+    - clientId: *env_otago_client_id
+      name: *env_otago_client_name
+      id: *env_otago_client_uuid
+      secret: *env_otago_client_secret
       publicClient: false
       protocol: openid-connect
       description: Backend Resource Service Client
@@ -760,16 +760,16 @@ realm:
 
 
   users:
-    - username: *env_otago__service_account
+    - username: *env_otago_client_service_account
       emailVerified: false
       enabled: true
       createdTimestamp: 1667974627111
       totp: false
-      serviceAccountClientId: *env_otago__client_id
+      serviceAccountClientId: *env_otago_client_id
       disableableCredentialTypes: [ ]
       requiredActions: [ ]
       realmRoles:
-        - *env_otago__default_roles
+        - *env_otago_client_default_roles
       clientRoles:
         realm-management:
           - manage-clients
