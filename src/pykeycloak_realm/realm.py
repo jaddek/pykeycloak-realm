@@ -1,7 +1,9 @@
-import logging
 import argparse
-from pykeycloak_realm.builders import export
+import logging
+
+from pykeycloak_realm.builder import export
 from pykeycloak_realm.config import RealmBuilderConfig
+
 
 def main():
     parser = argparse.ArgumentParser(
@@ -10,12 +12,12 @@ def main():
     parser.add_argument(
         "--from-realm",
         required=True,
-        help="Name of the preset config, e.g. 'otago'. Looks for ./data/realms/templates/{name}.realm.yml"
+        help="Name of the preset config, e.g. 'otago'. Looks for ./data/realms/templates/{name}.realm.yml",
     )
     parser.add_argument(
         "--to-realm",
         required=True,
-        help="Name for the output realm file, e.g. 'otago'. Will create ./data/realms/export/{name}.realm.json"
+        help="Name for the output realm file, e.g. 'otago'. Will create ./data/realms/export/{name}.realm.json",
     )
 
     args = parser.parse_args()
@@ -28,7 +30,7 @@ def main():
     export(
         from_template=args.from_realm,
         to_file=args.to_realm,
-        config=RealmBuilderConfig()
+        config=RealmBuilderConfig(),
     )
 
 
