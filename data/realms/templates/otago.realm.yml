@@ -524,6 +524,7 @@ realm:
       defaultClientScopes:
         - email
         - roles
+        - profile
       optionalClientScopes: [ ]
       protocolMappers:
         - name: email
