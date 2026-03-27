@@ -777,6 +777,7 @@ realm:
           - manage-users
           - manage-roles
           - manage-authorization
+          - manage-realm
         $ot_cid:
           - uma_protection
       notBefore: 0

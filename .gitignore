@@ -13,3 +13,10 @@ wheels/
 # data
 data/realms/export
 .python-version
+
+# editors/OS
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db
