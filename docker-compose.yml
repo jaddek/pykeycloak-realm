@@ -1,8 +1,8 @@
 services:
   keycloak:
-    image: quay.io/keycloak/keycloak:26.3.3
+    image: quay.io/keycloak/keycloak:26.4.0
     container_name: keycloak
-    command: start-dev #--import-realm
+    command: start-dev #--features=oid4vc #--import-realm
     environment:
       KC_LOG_LEVEL: ${KEYCLOAK_INSTANCE_LOGLEVEL:-ERROR}
       KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_INSTANCE_USERNAME:-admin}
