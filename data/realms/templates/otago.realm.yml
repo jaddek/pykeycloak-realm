@@ -778,6 +778,7 @@ realm:
           - manage-roles
           - manage-authorization
           - manage-realm
+          - impersonation
         $ot_cid:
           - uma_protection
       notBefore: 0
