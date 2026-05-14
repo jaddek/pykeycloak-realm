@@ -168,6 +168,17 @@ tests: ## Run all tests
 	@$(load_env); $(PY_RUN) pytest tests -vv -s
 
 
+release-bump: ## Sync pyproject version from GITHUB_REF_NAME (vX.Y.Z)
+	@python3 bin/sync_version_from_tag.py
+
+release-bump-tag: ## Sync pyproject version from TAG=vX.Y.Z
+	@if [ -z "$(TAG)" ]; then \
+		echo "TAG is required. Example: make release-bump-tag TAG=v0.7.4"; \
+		exit 1; \
+	fi
+	@python3 bin/sync_version_from_tag.py --tag "$(TAG)"
+
+
 # =========
 # Helpers
 # ==========
