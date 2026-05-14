@@ -142,7 +142,7 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     needs: build
-    if: startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/feature/14052026-publish'
+    if: startsWith(github.ref, 'refs/tags/v')
     environment:
       name: pypi
     permissions:
@@ -189,4 +189,3 @@ jobs:
           generate_release_notes: true
           files: |
             dist/*
-i
