@@ -26,7 +26,7 @@ REALM_RUN := make set-python-version;\
 	PYTHONPATH=src uv run python src/pykeycloak_realm/realm.py
 
 DC := docker compose
-PYTHON_VER := $(shell tr -d '\n' < .python-version)
+PYTHON_VER := $(shell [ -f .python-version ] && tr -d '\n' < .python-version || echo "")
 CURRENT_VER := $(shell python3 -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')
 
 define load_env
@@ -68,7 +68,7 @@ help:
 	@echo ""
 	@echo "📦 Project Makefile Commands:"
 	@echo "---------------------------------------------"
-	@awk 'BEGIN {FS = ":.*?#"} /^[a-zA-Z_-]+:.*?#/ { printf "  \055[36m%-30s\055[0m %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
+	@awk 'BEGIN {FS = ":.*## "}; /^[a-zA-Z0-9_\/.%+-]+:.*## / { printf "  \033[36m%-30s\033[0m %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
 
 # ========================
 # Project Setup
