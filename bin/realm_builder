@@ -2,6 +2,7 @@
 
 import logging
 import os
+
 from pykeycloak_realm.realm import main
 
 LOG_LEVEL = os.getenv("LOG_LEVEL", "DEBUG").upper()
@@ -14,7 +15,9 @@ if LOG_FILE:
 
 logging.basicConfig(
     level=getattr(logging, LOG_LEVEL, logging.DEBUG),
-    format=os.getenv("LOG_FORMAT", "%(levelname)s - %(asctime)s - %(name)s - %(message)s"),
+    format=os.getenv(
+        "LOG_FORMAT", "%(levelname)s - %(asctime)s - %(name)s - %(message)s"
+    ),
     handlers=log_handlers,
 )
 

@@ -25,13 +25,24 @@ def template_load(
         else f"{template_name}{template_suffix}"
     )
 
-    file_path = (Path(templates_path) / name).resolve()
+    template_root = Path(templates_path).resolve()
+    file_path = (template_root / name).resolve()
+
+    if template_root not in file_path.parents and file_path != template_root:
+        raise ValueError(f"Template path escapes templates directory: {file_path}")
 
     if not file_path.is_file():
         raise FileNotFoundError(f"Preset file does not exist: {file_path}")
 
     with file_path.open(encoding="utf-8") as f:
-        return yaml.safe_load(f) or {}
+        loaded = yaml.safe_load(f) or {}
+
+    if not isinstance(loaded, dict):
+        raise ValueError(
+            f"Template file root must be a mapping/object, got {type(loaded).__name__}"
+        )
+
+    return loaded
 
 
 def write_to_realm_import_file(

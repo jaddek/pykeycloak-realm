@@ -55,8 +55,17 @@ class TestRealmBuilderConfig:
         filename = config.get_realm_filename("my_realm")
 
         # Assert
-        expected = Path("./output/my_realm.realm.json")
+        expected = Path("./output/my_realm.realm.json").resolve()
         assert filename == expected
+
+    def test_get_realm_filename_rejects_path_traversal(self, tmp_path):
+        config = RealmBuilderConfig(
+            _template_export_dir_path=str(tmp_path),
+            realm_file_suffix=".realm.json",
+        )
+
+        with pytest.raises(ValueError, match="escapes export directory"):
+            config.get_realm_filename("../outside")
 
     def test_path_resolution_in_post_init(self, tmp_path, monkeypatch):
         # Clear environment variables to ensure consistent behavior

@@ -86,9 +86,32 @@ class TestTemplateLoad:
                 templates_path=str(tmp_path),
             )
 
+    def test_template_load_path_traversal_is_rejected(self, tmp_path):
+        outside = tmp_path.parent / "outside.realm.yml"
+        outside.write_text("realm: {name: outside}")
+
+        with pytest.raises(ValueError, match="escapes templates directory"):
+            template_load(
+                template_name=f"../{outside.name.removesuffix('.realm.yml')}",
+                template_suffix=".realm.yml",
+                templates_path=str(tmp_path),
+            )
+
+    def test_template_load_non_mapping_root_rejected(self, tmp_path):
+        template_file = tmp_path / "invalid-root.realm.yml"
+        template_file.write_text("- item1\n- item2\n")
+
+        with pytest.raises(
+            ValueError, match="Template file root must be a mapping/object"
+        ):
+            template_load(
+                template_name="invalid-root",
+                template_suffix=".realm.yml",
+                templates_path=str(tmp_path),
+            )
+
 
 class TestWriteToRealmImportFile:
-
     def test_write_to_realm_import_file_success(self, tmp_path):
         # Arrange
         realm_data = {"realm": "test-realm", "clients": []}
@@ -151,7 +174,6 @@ class TestWriteToRealmImportFile:
 
 
 class TestDeepReplace:
-
     def test_deep_replace_string_replacement(self):
         # Arrange
         value = "old_value"
@@ -222,7 +244,6 @@ class TestDeepReplace:
 
 
 class TestRealmTransformer:
-
     @pytest.fixture
     def sample_template(self):
         return {

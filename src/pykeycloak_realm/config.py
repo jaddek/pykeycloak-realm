@@ -36,9 +36,13 @@ class RealmBuilderConfig:
     )
 
     def get_realm_filename(self, filename: str) -> Path:
-        return (
-            Path(self._template_export_dir_path) / f"{filename}{self.realm_file_suffix}"
-        )
+        export_root = Path(self._template_export_dir_path).resolve()
+        target = (export_root / f"{filename}{self.realm_file_suffix}").resolve()
+
+        if export_root not in target.parents and target != export_root:
+            raise ValueError(f"Output path escapes export directory: {target}")
+
+        return target
 
     @property
     def template_export_dir_path(self) -> str:

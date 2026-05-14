@@ -49,7 +49,7 @@ vars:
       v_pl_da: &v_pv_deny_all "system_policy_time__deny_all"
 
   components:
-     upp: &v_c_user_profile_provider "0c53a406-0c53-7f45-bd2c-103dd76bab03"
+    upp: &v_c_user_profile_provider "0c53a406-0c53-7f45-bd2c-103dd76bab03"
 
   scopes: # v_scp = var scopes
     v_v: &v_scp_view "view"
@@ -551,6 +551,14 @@ realm:
             access.token.claim: false
             claim.name: username
             jsonType.label: String
+
+        - name: audience-mapper
+          protocol: openid-connect
+          protocolMapper: oidc-audience-mapper
+          config:
+            included.client.audience: otago_proxy_service_client
+            access.token.claim: true
+            id.token.claim:
 
         - name: firstName
           protocol: openid-connect
